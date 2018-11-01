@@ -1,0 +1,28 @@
+{
+  "name": "json-semantic",
+  "version": "0.0.1",
+  "description": "A specification and implementation for verifying and generating(mock) JSON data.",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "npm run clean && npm run compile",
+    "clean": "gts clean",
+    "compile": "tsc -p .",
+    "prepublish": "npm run build",
+    "test": "ts-node src/test.ts"
+  },
+  "devDependencies": {
+    "@types/lodash.clonedeep": "^4.5.4",
+    "@types/lodash.topath": "^4.5.4",
+    "@types/mockjs": "^1.0.1",
+    "gts": "^0.8.0",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.1.5"
+  },
+  "dependencies": {
+    "jsondiffpatch": "^0.3.11",
+    "lodash.clonedeep": "^4.5.0",
+    "lodash.topath": "^4.5.2",
+    "mockjs": "^1.0.1-beta3"
+  }
+}
