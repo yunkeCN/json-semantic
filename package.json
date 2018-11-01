@@ -4,6 +4,8 @@
   "description": "A specification and implementation for verifying and generating(mock) JSON data.",
   "main": "index.js",
   "license": "MIT",
+  "author": "jinkerjiang@gmail.com",
+  "repository": "https://github.com/yunkeCN/json-semantic.git",
   "scripts": {
     "build": "npm run clean && npm run compile",
     "clean": "gts clean",
