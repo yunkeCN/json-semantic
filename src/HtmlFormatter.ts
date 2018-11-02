@@ -24,8 +24,8 @@ class HtmlFormatter extends DefaultHtmlFormatter {
         return `/${value.source}/${value.flags}`;
       }
       return value;
-    });
-    context.out(`<pre>${htmlEscape(text)}</pre>`);
+    }, 2);
+    context.out(`<pre>${text ? htmlEscape(text) : text}</pre>`);
   }
 }
 
