@@ -105,14 +105,11 @@ export function convertToMockJsTemplate(
 ): {
   template: any,
   rule?: string,
-  ruleMap?: { [path: string]: any },
 } {
   const isNum = isNumber(schema);
   const isStr = isString(schema);
   const isBool = isBoolean(schema);
   const isUndef = isUndefined(schema);
-
-  const ruleMap: { [path: string]: any } = {};
 
   if (isNum || isStr || isBool || isUndef) {
     return { template: schema };
@@ -128,61 +125,44 @@ export function convertToMockJsTemplate(
       const clone: any[] = (schema as any[]).map((schemaValue, index) => {
         const {
           template,
-          ruleMap: ruleMapNested,
         } = convertToMockJsTemplate(schemaValue as ObjectSchema, `${path}.${index}`);
-        if (ruleMapNested) {
-          Object.assign(ruleMap, ruleMapNested);
-        }
         return template;
       });
-      return { template: clone, ruleMap };
+      return { template: clone };
     } else {
       const clone: any = {};
       Object.keys(schema1).forEach((key) => {
         const schemaValue = schema1[key];
         const {
           template,
-          ruleMap: ruleMapNested,
         } = convertToMockJsTemplate(schemaValue as ObjectSchema, `${path}.${key}`);
-        if (ruleMapNested) {
-          Object.assign(ruleMap, ruleMapNested);
-        }
         clone[key] = template;
       });
-      return { template: clone, ruleMap };
+      return { template: clone };
     }
   }
 
-  ruleMap[`${path}`] = schema1;
   const { __format: format, __max: max, __min: min, __ratio: ratio, __item: item } = schema1;
 
   switch (type) {
     case 'integer':
-      ruleMap[`${path}`] = schema1;
-      return { template: `@integer(${min}, ${max})`, ruleMap };
+      return { template: `@integer(${min}, ${max})` };
     case 'float':
-      ruleMap[`${path}`] = schema1;
-      return { template: `@float(${min}, ${max})`, ruleMap };
+      return { template: `@float(${min}, ${max})` };
     case 'boolean':
-      ruleMap[`${path}`] = schema1;
-      return { template: `@boolean(${ratio}, 1)`, ruleMap };
+      return { template: `@boolean(${ratio}, 1)` };
     case 'string':
       if (typeof format === 'string') {
-        return { template: `@${format}`, ruleMap };
+        return { template: `@${format}` };
       }
-      return { template: format, ruleMap };
+      return { template: format };
     case 'array':
       const {
         template,
-        ruleMap: ruleMapNested,
       } = convertToMockJsTemplate(item, `${path}.[]`);
-      if (ruleMapNested) {
-        Object.assign(ruleMap, ruleMapNested);
-      }
       return {
         template: [template],
         rule: `${typeof min === 'undefined' ? '' : min}-${typeof max === 'undefined' ? '' : max}`,
-        ruleMap,
       };
     default:
       throw new Error(`Unsupported type: ${type}`);
