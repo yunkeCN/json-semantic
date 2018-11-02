@@ -1,6 +1,6 @@
 {
   "name": "json-semantic",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "A specification and implementation for verifying and generating(mock) JSON data.",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
