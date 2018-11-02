@@ -232,11 +232,10 @@ const diffFilter = function(context: DiffContext) {
         const reg = REG_MAP[format];
         if (reg) {
           if (reg.test(context.left)) {
-            (context as any).setResult([context.right, context.left]).exit();
+            (context as any).setResult([context.left, context.right]).exit();
           } else {
             (context as any).setResult(undefined).exit();
           }
-          return;
         } else {
           throw new Error(`Unsupported format: ${format}`);
         }
