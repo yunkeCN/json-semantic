@@ -226,15 +226,16 @@ const diffFilter = function(context: DiffContext) {
       if (format instanceof RegExp) {
         if ((format as RegExp).test(context.left as string)) {
           (context as any).setResult(undefined).exit();
-          return;
+        } else {
+          (context as any).setResult([context.left, context.right]).exit();
         }
       } else {
         const reg = REG_MAP[format];
         if (reg) {
           if (reg.test(context.left)) {
-            (context as any).setResult([context.left, context.right]).exit();
-          } else {
             (context as any).setResult(undefined).exit();
+          } else {
+            (context as any).setResult([context.left, context.right]).exit();
           }
         } else {
           throw new Error(`Unsupported format: ${format}`);
@@ -244,24 +245,23 @@ const diffFilter = function(context: DiffContext) {
       if (/^\d+\.\d+$/.test(context.left as string)) {
         (context as any).setResult(undefined).exit();
       } else {
-        (context as any).setResult([context.right, context.left]).exit();
+        (context as any).setResult([context.left, context.right]).exit();
       }
     } else if (type === 'integer') {
       if (/^\d+$/.test(context.left as string)) {
         (context as any).setResult(undefined).exit();
       } else {
-        (context as any).setResult([context.right, context.left]).exit();
+        (context as any).setResult([context.left, context.right]).exit();
       }
     } else if (type === 'array') {
       const leftArr = context.left as any[];
       const rightArr = leftArr.map(() => context.right.__item);
       (context as any).setResult(getDiffPatcher().diff(leftArr, rightArr)).exit();
-      return;
     }
   }
 };
 // a filterName is useful if I want to allow other filters to be inserted before/after this one
-(diffFilter as any).filterName = 'json-semantic';
+(diffFilter as any).filterName = 'json-semantic-filter';
 
 export function getDiffPatcher() {
   const diffPatcher = new jsondiffpatch.DiffPatcher();
