@@ -17,15 +17,19 @@ function htmlEscape(text: string): string {
   return html;
 }
 
-class HtmlFormatter extends DefaultHtmlFormatter {
+class HtmlFormatter extends DefaultHtmlFormatter implements jsondiffpatch.Formatter {
   formatValue(context: any, value: any) {
     const text = JSON.stringify(value, (key: string, value: any) => {
       if (value instanceof RegExp) {
         return `/${value.source}/${value.flags}`;
       }
       return value;
-    }, 2);
+    }, 4);
     context.out(`<pre>${text ? htmlEscape(text) : text}</pre>`);
+  }
+
+  format(delta: jsondiffpatch.Delta, original: any): string {
+    return super.format(delta, original);
   }
 }
 
