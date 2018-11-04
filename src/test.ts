@@ -1,4 +1,5 @@
-import { generate, htmlFormat, ObjectSchema, parse, stringify, verify } from "./index";
+import { generate, htmlFormat, parse, stringify, verify } from "./index";
+import { ObjectSchema } from "./types";
 
 const testSchema: ObjectSchema = {
   number: 0,

@@ -2,25 +2,18 @@ import * as jsondiffpatch from "jsondiffpatch";
 import { Delta, DiffContext } from "jsondiffpatch";
 import * as mockjs from "mockjs";
 import HtmlFormatter from "./HtmlFormatter";
+import { ObjectSchema } from './types';
+
+export {
+  ObjectSchema,
+  StringSchema,
+  BooleanSchema,
+  NumberSchema,
+  ArraySchemaWithGenerics,
+  ArraySchema,
+} from "./types";
 
 const htmlFormatter = new HtmlFormatter();
-
-export interface NumberSchema {
-  __type: 'integer' | 'float';
-  __min: number;
-  __max: number;
-}
-
-export interface BooleanSchema {
-  __type: 'boolean';
-  __ratio: number;
-}
-
-export type TFormat = 'cname' | 'name' | 'phone'
-  | 'paragraph' | 'cparagraph' | 'sentence' | 'csentence' | 'word' | 'cword'
-  | 'title' | 'ctitle' | 'hex' | 'rgb' | 'rgba' | 'hsl'
-  | 'image' | 'dataImage' | 'date' | 'time' | 'datetime' | 'now'
-  | 'url' | 'protocol' | 'domain' | 'email' | 'ip' | 'id' | RegExp;
 
 const REG_MAP: { [key: string]: RegExp } = {
   cname: /[\u4e00-\u9fa5]+/,
@@ -51,37 +44,6 @@ const REG_MAP: { [key: string]: RegExp } = {
   ip: /((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))/,
   id: /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/,
 };
-
-export interface StringSchema {
-  __type: 'string';
-  __format?: TFormat;
-  __min?: number;
-  __max?: number;
-}
-
-export interface ArraySchema {
-  __type: 'array';
-  __min: number;
-  __max: number;
-  __item: ValueType;
-}
-
-export type ValueTypeExcludeArray = number | string | boolean | ObjectSchema |
-  NumberSchema | BooleanSchema | StringSchema | ArraySchema | void;
-
-export type ValueType = ValueTypeExcludeArray | ValueTypeExcludeArray[];
-
-export interface ObjectSchema {
-  [key: string]: ValueType;
-
-  __type?: never;
-  __min?: never;
-  __max?: never;
-  __item?: never;
-  __format?: never;
-  __ratio?: never;
-}
-
 
 function isNumber(val: any): boolean {
   return typeof val === 'number';
