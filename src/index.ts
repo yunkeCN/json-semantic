@@ -184,13 +184,13 @@ const diffFilter = function(context: DiffContext) {
         }
       }
     } else if (type === 'float') {
-      if (/^\d+\.\d+$/.test(context.left as string)) {
+      if (/^-?\d+\.\d+$/.test(context.left as string)) {
         (context as any).setResult(undefined).exit();
       } else {
         (context as any).setResult([context.left, context.right]).exit();
       }
     } else if (type === 'integer') {
-      if (/^\d+$/.test(context.left as string)) {
+      if (/^-?\d+$/.test(context.left as string)) {
         (context as any).setResult(undefined).exit();
       } else {
         (context as any).setResult([context.left, context.right]).exit();
