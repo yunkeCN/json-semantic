@@ -18,8 +18,11 @@ export type TFormat = 'cname' | 'name' | 'phone'
 export interface StringSchema {
   __type: 'string';
   __format?: TFormat;
-  __min?: number;
-  __max?: number;
+}
+
+export interface RefSchema {
+  __type: 'ref';
+  __jsonPath: string;
 }
 
 export interface ArraySchema {
@@ -37,7 +40,7 @@ export interface ArraySchemaWithGenerics<T> {
 }
 
 export type ValueTypeExcludeArray = number | string | boolean | ObjectSchema |
-  NumberSchema | BooleanSchema | StringSchema | ArraySchema | void;
+  NumberSchema | BooleanSchema | StringSchema | ArraySchema | RefSchema | void;
 
 export type ValueType = ValueTypeExcludeArray | ValueTypeExcludeArray[];
 
@@ -50,4 +53,5 @@ export interface ObjectSchema {
   __item?: never;
   __format?: never;
   __ratio?: never;
+  __jsonPath?: never;
 }

@@ -82,3 +82,14 @@ if (delta) {
   console.info('visual: ', htmlFormat(delta, jsonData))
 }
 ```
+
+## schema参数
+参数 | 含义 | 取值
+---|---|---
+__type | 类型 | `string`\|`integer`\|`float`\|`boolean`\|`array`\|`ref`
+__format | 格式，只有在`__type`等于`string`时才设置 | `cname` \| `name` \| `phone` \| `paragraph` \| `cparagraph` \| `sentence` \| `csentence` \| `word` \| `cword`\| `title` \| `ctitle` \| `hex` \| `rgb` \| `rgba` \| `hsl`\| `image` \| `dataImage` \| `date` \| `time` \| `datetime` \| `now` \| `url` \| `protocol` \| `domain` \| `email` \| `ip` \| `id` \| RegExp
+__min | 最小值，当`__type`等于`integer`或`float`时表示数字最小值，当`__type`等于`array`时表示数组长度最小值 | 数字
+__max | 最小值，当`__type`等于`integer`或`float`时表示数字最大值，当`__type`等于`array`时表示数组长度最大值 | 数字
+__item | 数组元素 | json结构
+__ratio | 几率 | 当`__type`等于`boolean`时表示`true`出现的几率
+__jsonPath | [json path](https://github.com/dchester/jsonpath) | 当`__type`等于`ref`时, 取值路径, `$.self`已被内部占用

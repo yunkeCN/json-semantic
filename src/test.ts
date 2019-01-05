@@ -37,10 +37,22 @@ const testSchema: ObjectSchema = {
       },
     },
   },
+  refSchema: {
+    __type: 'ref',
+    __jsonPath: '$.self.array[0]',
+  },
+  refSchemaOther: {
+    __type: 'ref',
+    __jsonPath: '$.other',
+  },
+  refSchemaNoExist: {
+    __type: 'ref',
+    __jsonPath: '$.other1.add',
+  },
 };
 
 const schemaStr = stringify(testSchema);
-console.info('generate: ', generate(testSchema));
+console.info('generate: ', generate(testSchema, { other: 1 }));
 console.info('parse: ', parse(schemaStr));
 
 const jsonData = {

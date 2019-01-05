@@ -15,6 +15,7 @@
     "test": "ts-node src/test.ts"
   },
   "devDependencies": {
+    "@types/jsonpath": "^0.2.0",
     "@types/lodash.clonedeep": "^4.5.4",
     "@types/lodash.topath": "^4.5.4",
     "@types/mockjs": "^1.0.1",
@@ -24,6 +25,7 @@
   },
   "dependencies": {
     "jsondiffpatch": "^0.3.11",
+    "jsonpath": "^1.0.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.topath": "^4.5.2",
     "mockjs": "^1.0.1-beta3"

@@ -1,5 +1,6 @@
 import * as jsondiffpatch from "jsondiffpatch";
 import { Delta, DiffContext } from "jsondiffpatch";
+import * as jsonpath from 'jsonpath';
 import * as mockjs from "mockjs";
 import HtmlFormatter from "./HtmlFormatter";
 import { ObjectSchema } from './types';
@@ -61,13 +62,26 @@ function isUndefined(val: any): boolean {
   return typeof val === 'undefined';
 }
 
-export function convertToMockJsTemplate(
-  schema: ObjectSchema | number | boolean | string | undefined | any[],
-  path = '',
-): {
+function isArray(val: any): boolean {
+  return Object.prototype.toString.call(val) === '[object Array]';
+}
+
+export function convertToMockJsTemplate(options: {
+  schema: ObjectSchema | number | boolean | string | undefined | any[];
+  args?: any;
+  path?: string
+}): {
   template: any,
   rule?: string,
 } {
+  const { schema, path = '' } = options;
+
+  let { args = {} } = options;
+
+  if (!path) {
+    args = { ...args, self: schema };
+  }
+
   const isNum = isNumber(schema);
   const isStr = isString(schema);
   const isBool = isBoolean(schema);
@@ -82,12 +96,15 @@ export function convertToMockJsTemplate(
   const type = schema1.__type;
 
   if (!type) {
-    const isArr = Object.prototype.toString.call(schema1) === '[object Array]';
-    if (isArr) {
+    if (isArray(schema1)) {
       const clone: any[] = (schema as any[]).map((schemaValue, index) => {
         const {
           template,
-        } = convertToMockJsTemplate(schemaValue as ObjectSchema, `${path}.${index}`);
+        } = convertToMockJsTemplate({
+          schema: schemaValue as ObjectSchema,
+          path: `${path}.${index}`,
+          args,
+        });
         return template;
       });
       return { template: clone };
@@ -97,14 +114,25 @@ export function convertToMockJsTemplate(
         const schemaValue = schema1[key];
         const {
           template,
-        } = convertToMockJsTemplate(schemaValue as ObjectSchema, `${path}.${key}`);
+        } = convertToMockJsTemplate({
+          schema: schemaValue as ObjectSchema,
+          path: `${args}.${key}`,
+          args,
+        });
         clone[key] = template;
       });
       return { template: clone };
     }
   }
 
-  const { __format: format, __max: max, __min: min, __ratio: ratio, __item: item } = schema1;
+  const {
+    __format: format,
+    __max: max,
+    __min: min,
+    __ratio: ratio,
+    __item: item,
+    __jsonPath: jsonPath,
+  } = schema1;
 
   switch (type) {
     case 'integer':
@@ -121,10 +149,29 @@ export function convertToMockJsTemplate(
     case 'array':
       const {
         template,
-      } = convertToMockJsTemplate(item, `${path}.[]`);
+      } = convertToMockJsTemplate({
+        schema: item,
+        args,
+        path: `${path}.[]`,
+      });
       return {
         template: [template],
         rule: `${typeof min === 'undefined' ? '' : min}-${typeof max === 'undefined' ? '' : max}`,
+      };
+    case 'ref':
+      if (!jsonPath) {
+        throw new Error(`__jsonPath must specified when __type is ref`);
+      }
+      const query = jsonpath.value(args, jsonPath);
+      const {
+        template: templateRef,
+      } = convertToMockJsTemplate({
+        schema: query,
+        args,
+        path,
+      });
+      return {
+        template: templateRef,
       };
     default:
       throw new Error(`Unsupported type: ${type}`);
@@ -152,8 +199,11 @@ export function parse(schemaStr: string): any {
   })
 }
 
-export function generate(schema: ObjectSchema): any {
-  return mockjs.mock(convertToMockJsTemplate(schema).template);
+export function generate(schema: ObjectSchema, args: any): any {
+  return mockjs.mock(convertToMockJsTemplate({
+    schema,
+    args
+  }).template);
 }
 
 const diffFilter = function(context: DiffContext) {
