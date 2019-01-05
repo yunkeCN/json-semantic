@@ -66,7 +66,7 @@ const jsonData = {
   "stringWithSchema1": "g.edshb@zjb.eh",
   "arrayWithSchema": [{ "a": "6832" }, { "a": "56" }, { "b": "7248" }, { "a": "48" }]
 };
-const delta = verify(jsonData, testSchema);
+const delta = verify(jsonData, testSchema, { other: 1 });
 console.info('verify: ', delta);
 
 if (delta) {

@@ -206,7 +206,7 @@ export function generate(schema: ObjectSchema, args: any): any {
   }).template);
 }
 
-const diffFilter = function(context: DiffContext) {
+const makeDiffFilter = (refData: any) => function(context: DiffContext) {
   if (!context.right) {
     return;
   }
@@ -248,21 +248,31 @@ const diffFilter = function(context: DiffContext) {
     } else if (type === 'array') {
       const leftArr = context.left as any[];
       const rightArr = leftArr.map(() => context.right.__item);
-      (context as any).setResult(getDiffPatcher().diff(leftArr, rightArr)).exit();
+      (context as any).setResult(getDiffPatcher(refData).diff(leftArr, rightArr)).exit();
+    } else if (type === 'ref') {
+      const left = context.left;
+      const right = jsonpath.value({
+        self: (context as any).root.left,
+        ...refData,
+      }, context.right.__jsonPath);
+      (context as any).setResult(getDiffPatcher(refData).diff(left, right)).exit();
     }
   }
 };
-// a filterName is useful if I want to allow other filters to be inserted before/after this one
-(diffFilter as any).filterName = 'json-semantic-filter';
 
-export function getDiffPatcher() {
+export function getDiffPatcher(refData: any = {}) {
   const diffPatcher = new jsondiffpatch.DiffPatcher();
+
+  const diffFilter = makeDiffFilter(refData);
+  // a filterName is useful if I want to allow other filters to be inserted before/after this one
+  (diffFilter as any).filterName = 'json-semantic-filter';
+
   (diffPatcher as any).processor.pipes.diff.before('trivial', diffFilter);
   return diffPatcher;
 }
 
-export function verify(jsonData: any, schema: ObjectSchema): Delta | undefined {
-  return getDiffPatcher().diff(jsonData, schema);
+export function verify(jsonData: any, schema: ObjectSchema, refData: any={}): Delta | undefined {
+  return getDiffPatcher(refData).diff(jsonData, schema);
 }
 
 export function htmlFormat(delta: Delta, schema: any): string {
