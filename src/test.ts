@@ -53,6 +53,7 @@ const testSchema: ObjectSchema = {
 
 const schemaStr = stringify(testSchema);
 console.info('generate: ', generate(testSchema, { other: 1 }));
+console.info('generate no mock: ', generate(testSchema, { other: 1 }, { genMock: false }));
 console.info('parse: ', parse(schemaStr));
 
 const jsonData = {

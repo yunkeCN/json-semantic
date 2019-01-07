@@ -69,7 +69,7 @@ function isArray(val: any): boolean {
 export function convertToMockJsTemplate(options: {
   schema: ObjectSchema | number | boolean | string | undefined | any[];
   args?: any;
-  path?: string
+  path?: string;
 }): {
   template: any,
   rule?: string,
@@ -102,7 +102,7 @@ export function convertToMockJsTemplate(options: {
           template,
         } = convertToMockJsTemplate({
           schema: schemaValue as ObjectSchema,
-          path: `${path}.${index}`,
+          path: `${path}.[].${index}`,
           args,
         });
         return template;
@@ -178,6 +178,92 @@ export function convertToMockJsTemplate(options: {
   }
 }
 
+function parseRef(options: {
+  schema: ObjectSchema | number | boolean | string | undefined | any[];
+  args: any;
+  path?: string;
+}): any {
+  const { schema, path } = options;
+
+  let { args = {} } = options;
+
+  if (!path) {
+    args = { ...args, self: schema };
+  }
+
+  const isNum = isNumber(schema);
+  const isStr = isString(schema);
+  const isBool = isBoolean(schema);
+  const isUndef = isUndefined(schema);
+
+  if (isNum || isStr || isBool || isUndef) {
+    return schema;
+  }
+
+  const schema1 = schema as ObjectSchema;
+
+  const type = schema1.__type;
+
+  if (!type) {
+    if (isArray(schema1)) {
+      const clone: any[] = (schema as any[]).map((schemaValue, index) => {
+        return parseRef({
+          schema: schemaValue as ObjectSchema,
+          path: `${path}.[].${index}`,
+          args,
+        });
+      });
+      return clone;
+    } else {
+      const clone: any = {};
+      Object.keys(schema1).forEach((key) => {
+        const schemaValue = schema1[key];
+        clone[key] = parseRef({
+          schema: schemaValue as ObjectSchema,
+          path: `${args}.${key}`,
+          args,
+        });
+      });
+      return clone;
+    }
+  }
+
+  const {
+    __format: format,
+    __max: max,
+    __min: min,
+    __ratio: ratio,
+    __item: item,
+    __jsonPath: jsonPath,
+  } = schema1;
+
+  switch (type) {
+    case 'integer':
+    case 'float':
+    case 'boolean':
+    case 'string':
+      return schema1;
+    case 'array':
+      return parseRef({
+        schema: item,
+        args,
+        path: `${path}.[]`,
+      });
+    case 'ref':
+      if (!jsonPath) {
+        throw new Error(`__jsonPath must specified when __type is ref`);
+      }
+      const query = jsonpath.value(args, jsonPath);
+      return parseRef({
+        schema: query,
+        args,
+        path,
+      });
+    default:
+      throw new Error(`Unsupported type: ${type}`);
+  }
+}
+
 const regExp = /regexp____(.+)____(.+)?/;
 
 export function stringify(schema: any): any {
@@ -199,11 +285,14 @@ export function parse(schemaStr: string): any {
   })
 }
 
-export function generate(schema: ObjectSchema, args: any): any {
-  return mockjs.mock(convertToMockJsTemplate({
-    schema,
-    args
-  }).template);
+export function generate(schema: ObjectSchema, args: any = {}, options: { genMock: boolean } = { genMock: true }): any {
+  if (options.genMock) {
+    return mockjs.mock(convertToMockJsTemplate({
+      schema,
+      args,
+    }).template);
+  }
+  return parseRef({ schema, args });
 }
 
 const makeDiffFilter = (refData: any) => function(context: DiffContext) {
@@ -271,7 +360,7 @@ export function getDiffPatcher(refData: any = {}) {
   return diffPatcher;
 }
 
-export function verify(jsonData: any, schema: ObjectSchema, refData: any={}): Delta | undefined {
+export function verify(jsonData: any, schema: ObjectSchema, refData: any = {}): Delta | undefined {
   return getDiffPatcher(refData).diff(jsonData, schema);
 }
 
