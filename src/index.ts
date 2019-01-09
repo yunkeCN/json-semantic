@@ -311,15 +311,11 @@ const makeDiffFilter = (refData: any) => function(context: DiffContext) {
           (context as any).setResult([context.left, context.right]).exit();
         }
       } else {
-        const reg = REG_MAP[format];
-        if (reg) {
-          if (reg.test(context.left)) {
-            (context as any).setResult(undefined).exit();
-          } else {
-            (context as any).setResult([context.left, context.right]).exit();
-          }
+        const reg = REG_MAP[format] || /.*/;
+        if (reg.test(context.left)) {
+          (context as any).setResult(undefined).exit();
         } else {
-          throw new Error(`Unsupported format: ${format}`);
+          (context as any).setResult([context.left, context.right]).exit();
         }
       }
     } else if (type === 'float') {

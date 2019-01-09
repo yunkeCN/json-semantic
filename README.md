@@ -87,7 +87,7 @@ if (delta) {
 参数 | 含义 | 取值
 ---|---|---
 __type | 类型 | `string`\|`integer`\|`float`\|`boolean`\|`array`\|`ref`
-__format | 格式，只有在`__type`等于`string`时才设置 | `cname` \| `name` \| `phone` \| `paragraph` \| `cparagraph` \| `sentence` \| `csentence` \| `word` \| `cword`\| `title` \| `ctitle` \| `hex` \| `rgb` \| `rgba` \| `hsl`\| `image` \| `dataImage` \| `date` \| `time` \| `datetime` \| `now` \| `url` \| `protocol` \| `domain` \| `email` \| `ip` \| `id` \| RegExp
+__format | 格式，当`__type`等于`string`时设置 | `cname` \| `name` \| `phone` \| `paragraph` \| `cparagraph` \| `sentence` \| `csentence` \| `word` \| `cword`\| `title` \| `ctitle` \| `hex` \| `rgb` \| `rgba` \| `hsl`\| `image` \| `dataImage` \| `date` \| `time` \| `datetime` \| `now` \| `url` \| `protocol` \| `domain` \| `email` \| `ip` \| `id` \| RegExp
 __min | 最小值，当`__type`等于`integer`或`float`时表示数字最小值，当`__type`等于`array`时表示数组长度最小值 | 数字
 __max | 最小值，当`__type`等于`integer`或`float`时表示数字最大值，当`__type`等于`array`时表示数组长度最大值 | 数字
 __item | 数组元素 | json结构
