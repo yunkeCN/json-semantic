@@ -1,3 +1,4 @@
+import * as jsonpath from 'jsonpath';
 import { generate, htmlFormat, parse, stringify, verify } from "./index";
 import { ObjectSchema } from "./types";
 
@@ -54,6 +55,15 @@ const testSchema: ObjectSchema = {
 const schemaStr = stringify(testSchema);
 console.info('generate: ', generate(testSchema, { other: 1 }));
 console.info('generate no mock: ', generate(testSchema, { other: 1 }, { genMock: false }));
+console.info('generate no mock with resolveRef: ', generate(testSchema, { other: 1 }, {
+  genMock: false,
+  resolveRef: (node: { args: any; jsonPath: string; schema: any; }) => {
+    if (node.schema.__jsonPath === '$.other1.add') {
+      return 'resolveByCustomer';
+    }
+    return jsonpath.value(node.args, node.jsonPath);
+  },
+}));
 console.info('parse: ', parse(schemaStr));
 
 const jsonData = {

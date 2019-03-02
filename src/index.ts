@@ -70,11 +70,12 @@ export function convertToMockJsTemplate(options: {
   schema: ObjectSchema | number | boolean | string | undefined | any[];
   args?: any;
   path?: string;
+  resolveRef?: (node: { args: any; jsonPath: string; schema: any; }) => any;
 }): {
   template: any,
   rule?: string,
 } {
-  const { schema, path = '' } = options;
+  const { schema, path = '', resolveRef } = options;
 
   let { args = {} } = options;
 
@@ -103,6 +104,7 @@ export function convertToMockJsTemplate(options: {
         } = convertToMockJsTemplate({
           schema: schemaValue as ObjectSchema,
           path: `${path}.[].${index}`,
+          resolveRef,
           args,
         });
         return template;
@@ -117,6 +119,7 @@ export function convertToMockJsTemplate(options: {
         } = convertToMockJsTemplate({
           schema: schemaValue as ObjectSchema,
           path: `${args}.${key}`,
+          resolveRef,
           args,
         });
         clone[key] = template;
@@ -152,6 +155,7 @@ export function convertToMockJsTemplate(options: {
       } = convertToMockJsTemplate({
         schema: item,
         args,
+        resolveRef,
         path: `${path}.[]`,
       });
       return {
@@ -162,12 +166,18 @@ export function convertToMockJsTemplate(options: {
       if (!jsonPath) {
         throw new Error(`__jsonPath must specified when __type is ref`);
       }
-      const query = jsonpath.value(args, jsonPath);
+      let query: any;
+      if (resolveRef) {
+        query = resolveRef({ args, jsonPath, schema: schema1 });
+      } else {
+        query = jsonpath.value(args, jsonPath);
+      }
       const {
         template: templateRef,
       } = convertToMockJsTemplate({
         schema: query,
         args,
+        resolveRef,
         path,
       });
       return {
@@ -178,12 +188,16 @@ export function convertToMockJsTemplate(options: {
   }
 }
 
+/**
+ *
+ */
 function parseRef(options: {
   schema: ObjectSchema | number | boolean | string | undefined | any[];
   args: any;
+  resolveRef?: (node: { args: any; jsonPath: string; schema: any; }) => any;
   path?: string;
 }): any {
-  const { schema, path } = options;
+  const { schema, path, resolveRef } = options;
 
   let { args = {} } = options;
 
@@ -209,8 +223,9 @@ function parseRef(options: {
       const clone: any[] = (schema as any[]).map((schemaValue, index) => {
         return parseRef({
           schema: schemaValue as ObjectSchema,
-          path: `${path}.[].${index}`,
           args,
+          resolveRef,
+          path: `${path}.[].${index}`,
         });
       });
       return clone;
@@ -220,8 +235,9 @@ function parseRef(options: {
         const schemaValue = schema1[key];
         clone[key] = parseRef({
           schema: schemaValue as ObjectSchema,
-          path: `${args}.${key}`,
           args,
+          resolveRef,
+          path: `${args}.${key}`,
         });
       });
       return clone;
@@ -247,16 +263,24 @@ function parseRef(options: {
       return parseRef({
         schema: item,
         args,
+        resolveRef,
         path: `${path}.[]`,
       });
     case 'ref':
       if (!jsonPath) {
         throw new Error(`__jsonPath must specified when __type is ref`);
       }
-      const query = jsonpath.value(args, jsonPath);
+      let query: any;
+      if (resolveRef) {
+        query = resolveRef({ args, jsonPath, schema: schema1 });
+      }
+      if (!query) {
+        query = jsonpath.value(args, jsonPath);
+      }
       return parseRef({
         schema: query,
         args,
+        resolveRef,
         path,
       });
     default:
@@ -266,6 +290,9 @@ function parseRef(options: {
 
 const regExp = /regexp____(.+)____(.+)?/;
 
+/**
+ * 类似JSON.stringify, 但是会处理正则等特殊值
+ */
 export function stringify(schema: any): any {
   return JSON.stringify(schema, (key: string, value: any) => {
     if (value instanceof RegExp) {
@@ -275,6 +302,9 @@ export function stringify(schema: any): any {
   });
 }
 
+/**
+ * 类似JSON.parse, 但是会处理正则等特殊值
+ */
 export function parse(schemaStr: string): any {
   return JSON.parse(schemaStr, (key: any, value: any) => {
     let exec;
@@ -285,14 +315,23 @@ export function parse(schemaStr: string): any {
   })
 }
 
-export function generate(schema: ObjectSchema, args: any = {}, options: { genMock: boolean } = { genMock: true }): any {
-  if (options.genMock) {
+export function generate(
+  schema: ObjectSchema,
+  args: any = {},
+  options: {
+    genMock: boolean;
+    resolveRef?: (node: { args: any; jsonPath: string; schema: any; }) => any;
+  } = { genMock: true },
+): any {
+  const { genMock, resolveRef } = options;
+  if (genMock) {
     return mockjs.mock(convertToMockJsTemplate({
       schema,
       args,
+      resolveRef,
     }).template);
   }
-  return parseRef({ schema, args });
+  return parseRef({ schema, args, resolveRef });
 }
 
 const makeDiffFilter = (refData: any) => function(context: DiffContext) {
