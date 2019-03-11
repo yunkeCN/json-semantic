@@ -19,6 +19,11 @@ const testSchema: ObjectSchema = {
     __min: 1,
     __max: 10,
   },
+  floatWithSchema: {
+    __type: 'float',
+    __min: 1.1,
+    __max: 1.4,
+  },
   stringWithSchema: {
     __type: 'string',
     __format: /135\d{8}/,
@@ -86,6 +91,7 @@ const jsonData = {
   "array": [2, 2],
   "object": { "a": 2, "b": "b" },
   "numberWithSchema": 4,
+  "floatWithSchema": 1.2,
   "stringWithSchema": "13529277784",
   "stringWithSchema1": "g.edshb@zjb.eh",
   "arrayWithSchema": [{ "a": "6832" }, { "a": "56" }, { "b": "7248" }, { "a": "48" }],

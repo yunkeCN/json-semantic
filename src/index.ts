@@ -135,8 +135,8 @@ export function convertToMockJsTemplate(options: {
 
   const {
     __format: format,
-    __max: max,
-    __min: min,
+    __max: max = 9007199254740992,
+    __min: min = -9007199254740992,
     __ratio: ratio,
     __item: item,
     __jsonPath: jsonPath,
@@ -146,7 +146,7 @@ export function convertToMockJsTemplate(options: {
     case 'integer':
       return { template: `@integer(${min}, ${max})` };
     case 'float':
-      return { template: `@float(${min}, ${max})` };
+      return { template: `@float(${min}, ${Math.floor(+max)}, 2, 10)` };
     case 'boolean':
       return { template: `@boolean(${ratio}, 1)` };
     case 'string':
@@ -364,13 +364,16 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
         }
       }
     } else if (type === 'float') {
-      if (/^-?\d+\.\d+$/.test(context.left as string)) {
+      const { __min: min = -Infinity, __max: max = Infinity } = context.right;
+      console.info({ min, max })
+      if (/^-?\d+\.\d+$/.test(context.left as string) && context.left >= min && context.left <= max) {
         (context as any).setResult(undefined).exit();
       } else {
         (context as any).setResult([context.left, context.right]).exit();
       }
     } else if (type === 'integer') {
-      if (/^-?\d+$/.test(context.left as string)) {
+      const { __min: min = -Infinity, __max: max = Infinity } = context.right;
+      if (/^-?\d+$/.test(context.left as string) && context.left >= min && context.left <= max) {
         (context as any).setResult(undefined).exit();
       } else {
         (context as any).setResult([context.left, context.right]).exit();
