@@ -38,6 +38,17 @@ const testSchema: ObjectSchema = {
       },
     },
   },
+  arrayWithSchema1: {
+    __type: 'array',
+    __min: 2,
+    __max: 5,
+    __item: {
+      a: {
+        __type: 'string',
+        __format: /\d+/,
+      },
+    },
+  },
   refSchema: {
     __type: 'ref',
     __jsonPath: '$.self.array[0]',
@@ -75,7 +86,8 @@ const jsonData = {
   "numberWithSchema": 4,
   "stringWithSchema": "13529277784",
   "stringWithSchema1": "g.edshb@zjb.eh",
-  "arrayWithSchema": [{ "a": "6832" }, { "a": "56" }, { "b": "7248" }, { "a": "48" }]
+  "arrayWithSchema": [{ "a": "6832" }, { "a": "56" }, { "b": "7248" }, { "a": "48" }],
+  "arrayWithSchema1": null
 };
 const delta = verify(jsonData, testSchema, { other: 1 });
 console.info('verify: ', delta);

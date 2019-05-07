@@ -334,7 +334,7 @@ export function generate(
   return parseRef({ schema, args, resolveRef });
 }
 
-const makeDiffFilter = (refData: any) => function(context: DiffContext) {
+const makeDiffFilter = (refData: any) => function (context: DiffContext) {
   if (!context.right) {
     return;
   }
@@ -371,7 +371,7 @@ const makeDiffFilter = (refData: any) => function(context: DiffContext) {
       }
     } else if (type === 'array') {
       const leftArr = context.left as any[];
-      const rightArr = leftArr.map(() => context.right.__item);
+      const rightArr = Array.isArray(leftArr) && leftArr.map(() => context.right.__item) || [context.right];
       (context as any).setResult(getDiffPatcher(refData).diff(leftArr, rightArr)).exit();
     } else if (type === 'ref') {
       const left = context.left;
