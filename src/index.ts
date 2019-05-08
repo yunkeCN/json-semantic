@@ -216,7 +216,7 @@ function parseRef(options: {
   const isUndef = isUndefined(schema);
   const isNul = isNull(schema);
 
-  if (isNum || isStr || isBool || isUndef || isNull) {
+  if (isNum || isStr || isBool || isUndef || isNul) {
     return schema;
   }
 
