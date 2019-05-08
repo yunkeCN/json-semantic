@@ -62,6 +62,10 @@ function isUndefined(val: any): boolean {
   return typeof val === 'undefined';
 }
 
+function isNull(val: any): boolean {
+  return val === null;
+}
+
 function isArray(val: any): boolean {
   return Object.prototype.toString.call(val) === '[object Array]';
 }
@@ -87,8 +91,9 @@ export function convertToMockJsTemplate(options: {
   const isStr = isString(schema);
   const isBool = isBoolean(schema);
   const isUndef = isUndefined(schema);
+  const isNul = isNull(schema);
 
-  if (isNum || isStr || isBool || isUndef) {
+  if (isNum || isStr || isBool || isUndef || isNul) {
     return { template: schema };
   }
 
@@ -209,8 +214,9 @@ function parseRef(options: {
   const isStr = isString(schema);
   const isBool = isBoolean(schema);
   const isUndef = isUndefined(schema);
+  const isNul = isNull(schema);
 
-  if (isNum || isStr || isBool || isUndef) {
+  if (isNum || isStr || isBool || isUndef || isNull) {
     return schema;
   }
 

@@ -40,7 +40,7 @@ export interface ArraySchemaWithGenerics<T> {
 }
 
 export type ValueTypeExcludeArray = number | string | boolean | ObjectSchema |
-  NumberSchema | BooleanSchema | StringSchema | ArraySchema | RefSchema | void;
+  NumberSchema | BooleanSchema | StringSchema | ArraySchema | RefSchema | void | null;
 
 export type ValueType = ValueTypeExcludeArray | ValueTypeExcludeArray[];
 
