@@ -350,14 +350,14 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
     const { __format: format } = (context.right as any);
     if (type === 'string') {
       if (format instanceof RegExp) {
-        if ((format as RegExp).test(context.left as string)) {
+        if ((format as RegExp).test(context.left as string) && isString(context.left)) {
           (context as any).setResult(undefined).exit();
         } else {
           (context as any).setResult([context.left, context.right]).exit();
         }
       } else {
         const reg = REG_MAP[format] || /.*/;
-        if (reg.test(context.left)) {
+        if (reg.test(context.left) && isString(context.left)) {
           (context as any).setResult(undefined).exit();
         } else {
           (context as any).setResult([context.left, context.right]).exit();
@@ -365,7 +365,6 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
       }
     } else if (type === 'float') {
       const { __min: min = -Infinity, __max: max = Infinity } = context.right;
-      console.info({ min, max })
       if (/^-?\d+\.\d+$/.test(context.left as string) && context.left >= min && context.left <= max) {
         (context as any).setResult(undefined).exit();
       } else {
