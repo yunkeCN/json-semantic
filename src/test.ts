@@ -32,6 +32,9 @@ const testSchema: ObjectSchema = {
     __type: 'string',
     __format: 'email',
   },
+  stringWithSchema2: {
+    __type: 'string',
+  },
   arrayWithSchema: {
     __type: 'array',
     __min: 2,
@@ -94,6 +97,7 @@ const jsonData = {
   "floatWithSchema": 1.2,
   "stringWithSchema": "13529277784",
   "stringWithSchema1": "g.edshb@zjb.eh",
+  "stringWithSchema2": null,
   "arrayWithSchema": [{ "a": "6832" }, { "a": "56" }, { "b": "7248" }, { "a": "48" }],
   "arrayWithSchema1": null,
   "null": null,
