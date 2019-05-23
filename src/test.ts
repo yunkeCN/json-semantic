@@ -1,5 +1,5 @@
 import * as jsonpath from 'jsonpath';
-import { generate, htmlFormat, parse, stringify, verify } from "./index";
+import { generate, htmlFormat, parse, stringify, verify } from './index';
 import { ObjectSchema } from "./types";
 
 const testSchema: ObjectSchema = {
@@ -22,7 +22,12 @@ const testSchema: ObjectSchema = {
   floatWithSchema: {
     __type: 'float',
     __min: 1.1,
-    __max: 1.4,
+    __max: 2.4,
+  },
+  floatWithSchema1: {
+    __type: 'float',
+    __min: 5.1524521411,
+    __max: 5.1524521416,
   },
   stringWithSchema: {
     __type: 'string',
@@ -74,7 +79,8 @@ const testSchema: ObjectSchema = {
 };
 
 const schemaStr = stringify(testSchema);
-console.info('generate: ', generate(testSchema, { other: 1 }));
+const generateSchemaStr = generate(testSchema, { other: 1 });
+console.info('generate: ', generateSchemaStr);
 console.info('generate no mock: ', generate(testSchema, { other: 1 }, { genMock: false }));
 console.info('generate no mock with resolveRef: ', generate(testSchema, { other: 1 }, {
   genMock: false,
@@ -95,6 +101,7 @@ const jsonData = {
   "object": { "a": 2, "b": "b" },
   "numberWithSchema": 4,
   "floatWithSchema": 1.2,
+  "floatWithSchema1": 5.15245214119,
   "stringWithSchema": "13529277784",
   "stringWithSchema1": "g.edshb@zjb.eh",
   "stringWithSchema2": null,
@@ -103,11 +110,11 @@ const jsonData = {
   "null": null,
   "undefined": "notUndefined"
 };
-const delta = verify(jsonData, testSchema, { other: 1 });
+const delta = verify(generateSchemaStr, testSchema, { other: 1 });
 console.info('verify: ', delta);
 
 if (delta) {
-  console.info('visual: ', htmlFormat(delta, jsonData))
+  console.info('visual: ', htmlFormat(delta, generateSchemaStr))
 }
 
 const test = {
