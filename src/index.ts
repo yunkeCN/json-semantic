@@ -46,6 +46,8 @@ const REG_MAP: { [key: string]: RegExp } = {
   id: /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/,
 };
 
+const baseStrExp = /.*/;
+
 function isNumber(val: any): boolean {
   return typeof val === 'number';
 }
@@ -146,14 +148,14 @@ export function convertToMockJsTemplate(options: {
     case 'integer':
       return { template: `@integer(${min}, ${max})` };
     case 'float':
-      return { template: `@float(${min}, ${Math.floor(+max)}, 2, 10)` };
+      return { template: `@float(${min}, ${Math.floor(+max)}, 2, 17)` };
     case 'boolean':
       return { template: `@boolean(${ratio}, 1)` };
     case 'string':
       if (typeof format === 'string') {
         return { template: `@${format}` };
       }
-      return { template: format };
+      return { template: format || baseStrExp };
     case 'array':
       const {
         template,
@@ -163,9 +165,15 @@ export function convertToMockJsTemplate(options: {
         resolveRef,
         path: `${path}.[]`,
       });
+
+      const temLen = mockjs.Random.integer(min || 0, max || 10);
+      const templates = [];
+      for (let i = 0; i < temLen; i++) {
+        templates.push(template);
+      }
+
       return {
-        template: [template],
-        rule: `${typeof min === 'undefined' ? '' : min}-${typeof max === 'undefined' ? '' : max}`,
+        template: templates,
       };
     case 'ref':
       if (!jsonPath) {
@@ -356,7 +364,7 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
           (context as any).setResult([context.left, context.right]).exit();
         }
       } else {
-        const reg = REG_MAP[format] || /.*/;
+        const reg = REG_MAP[format] || baseStrExp;
         if (reg.test(context.left) && isString(context.left)) {
           (context as any).setResult(undefined).exit();
         } else {
