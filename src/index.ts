@@ -5,6 +5,35 @@ import * as mockjs from "mockjs";
 import HtmlFormatter from "./HtmlFormatter";
 import { ObjectSchema } from './types';
 
+const MAX = 9007199254740992;
+const MIN = -9007199254740992;
+const random = mockjs.Random;
+// 覆盖mock随机生成float函数
+mockjs.Random.float = (min?: number, max?: number, dmin?: number, dmax?: number): number => {
+  min = min === undefined ? MIN : min;
+  max = max === undefined ? MAX : max;
+  dmin = dmin === undefined ? 0 : dmin;
+  dmin = Math.max(Math.min(dmin, 17), 0);
+  dmax = dmax === undefined ? 17 : dmax;
+  dmax = Math.max(Math.min(dmax, 17), 0);
+
+  if (max - min < 0) {
+    [max, min] = [min, max];
+  }
+
+  const rangeRes = max - min;
+  // 大于0小于1
+  if (rangeRes < 1) {
+    const rangeResDigits = rangeRes.toString().length - 2;
+    dmin = (rangeResDigits >= 0) ? rangeResDigits : dmin;
+    if (dmax - dmin < 0) {
+      [dmax, dmin] = [dmin, dmax];
+    }
+  }
+  const digits = random.integer(dmin, dmax);
+  return parseFloat((Math.random() * rangeRes + min).toFixed(digits))
+}
+
 export {
   ObjectSchema,
   StringSchema,
@@ -137,8 +166,8 @@ export function convertToMockJsTemplate(options: {
 
   const {
     __format: format,
-    __max: max = 9007199254740992,
-    __min: min = -9007199254740992,
+    __max: max = MAX,
+    __min: min = MIN,
     __ratio: ratio,
     __item: item,
     __jsonPath: jsonPath,
@@ -148,7 +177,7 @@ export function convertToMockJsTemplate(options: {
     case 'integer':
       return { template: `@integer(${min}, ${max})` };
     case 'float':
-      return { template: `@float(${min}, ${Math.floor(+max)}, 2, 17)` };
+      return { template: `@float(${min}, ${max}, 1, 17)` };
     case 'boolean':
       return { template: `@boolean(${ratio}, 1)` };
     case 'string':
