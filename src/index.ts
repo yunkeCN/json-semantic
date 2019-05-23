@@ -48,7 +48,7 @@ const htmlFormatter = new HtmlFormatter();
 const REG_MAP: { [key: string]: RegExp } = {
   cname: /[\u4e00-\u9fa5]+/,
   name: /[\w\s\.]+/,
-  email: /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
+  email: /^[a-zA-Z0-9_-]+[\.a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
   phone: /^(13[0-9]|14[579]|15[0-3,5-9]|16[6]|17[0135678]|18[0-9]|19[89])\d{8}$/,
   paragraph: /.+/,
   cparagraph: /.+/,
