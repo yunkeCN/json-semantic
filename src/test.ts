@@ -40,6 +40,10 @@ const testSchema: ObjectSchema = {
   stringWithSchema2: {
     __type: 'string',
   },
+  stringWithSchema3: {
+    __type: "string",
+    __format: "/.+\\.csv$/gi"
+  },
   arrayWithSchema: {
     __type: 'array',
     __min: 2,
@@ -105,16 +109,17 @@ const jsonData = {
   "stringWithSchema": "13529277784",
   "stringWithSchema1": "g.edshb@zjb.eh",
   "stringWithSchema2": null,
+  "stringWithSchema3": "4S0.csv",
   "arrayWithSchema": [{ "a": "6832" }, { "a": "56" }, { "b": "7248" }, { "a": "48" }],
   "arrayWithSchema1": null,
   "null": null,
   "undefined": "notUndefined"
 };
-const delta = verify(generateSchemaStr, testSchema, { other: 1 });
+const delta = verify(jsonData, testSchema, { other: 1 });
 console.info('verify: ', delta);
 
 if (delta) {
-  console.info('visual: ', htmlFormat(delta, generateSchemaStr))
+  console.info('visual: ', htmlFormat(delta, jsonData))
 }
 
 const test = {
