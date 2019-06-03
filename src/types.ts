@@ -17,7 +17,7 @@ export type TFormat = 'cname' | 'name' | 'phone'
 
 export interface StringSchema {
   __type: 'string';
-  __format?: TFormat;
+  __format?: TFormat | string;
 }
 
 export interface RefSchema {

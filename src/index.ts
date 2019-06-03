@@ -75,7 +75,24 @@ const REG_MAP: { [key: string]: RegExp } = {
   id: /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(1[0-2]))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/,
 };
 
+const isRegExp = /^(\/)(.+)(\/)(i|ig|gi|g)?$/;
+
 const baseStrExp = /.*/;
+
+export function handleRegExp(value: string): RegExp {
+  const exec = isRegExp.exec(value);
+  try {
+    if (exec) {
+      const pattern = exec[2];
+      const flags = exec[4] || "";
+      return new RegExp(pattern, flags)
+    }
+    return baseStrExp;
+  } catch (e) {
+    console.error("handleRegExp error:", e);
+    return baseStrExp;
+  }
+};
 
 function isNumber(val: any): boolean {
   return typeof val === 'number';
@@ -83,6 +100,14 @@ function isNumber(val: any): boolean {
 
 function isString(val: any): boolean {
   return typeof val === 'string';
+}
+
+//匹配字符串格式的正则表达式
+function isStrRegExp(val: any): boolean {
+  if (val instanceof RegExp) {
+    return false;
+  }
+  return isRegExp.test(val);
 }
 
 function isBoolean(val: any): boolean {
@@ -181,10 +206,11 @@ export function convertToMockJsTemplate(options: {
     case 'boolean':
       return { template: `@boolean(${ratio}, 1)` };
     case 'string':
-      if (typeof format === 'string') {
+      if (isString(format) && !isStrRegExp(format)) {
         return { template: `@${format}` };
       }
-      return { template: format || baseStrExp };
+      const format1 = (format && isStrRegExp(format)) ? handleRegExp(format) : format;
+      return { template: format1 || baseStrExp };
     case 'array':
       const {
         template,
@@ -393,7 +419,7 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
           (context as any).setResult([context.left, context.right]).exit();
         }
       } else {
-        const reg = REG_MAP[format] || baseStrExp;
+        const reg = REG_MAP[format] || handleRegExp(format);
         if (reg.test(context.left) && isString(context.left)) {
           (context as any).setResult(undefined).exit();
         } else {
