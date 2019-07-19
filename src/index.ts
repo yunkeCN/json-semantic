@@ -343,7 +343,7 @@ function parseRef(options: {
       if (resolveRef) {
         query = resolveRef({ args, jsonPath, schema: schema1 });
       }
-      if (!query) {
+      if (query === undefined) {
         query = jsonpath.value(args, jsonPath);
       }
       return parseRef({
