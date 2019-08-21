@@ -419,9 +419,13 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
           (context as any).setResult([context.left, context.right]).exit();
         }
       } else {
-        const reg = REG_MAP[format] || handleRegExp(format);
-        if (reg.test(context.left) && isString(context.left)) {
-          (context as any).setResult(undefined).exit();
+        if (REG_MAP[format] || format === '' || format === undefined || format === null) {
+          const reg = REG_MAP[format] || handleRegExp(format);
+          if (reg.test(context.left) && isString(context.left)) {
+            (context as any).setResult(undefined).exit();
+          } else {
+            (context as any).setResult([context.left, context.right]).exit();
+          }
         } else {
           (context as any).setResult([context.left, context.right]).exit();
         }
