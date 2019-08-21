@@ -80,6 +80,10 @@ const testSchema: ObjectSchema = {
     __type: 'ref',
     __jsonPath: '$.other1.add',
   },
+  message: {
+    __type: "string",
+    __format: "xx"
+  }
 };
 
 const schemaStr = stringify(testSchema);
@@ -113,7 +117,8 @@ const jsonData = {
   "arrayWithSchema": [{ "a": "6832" }, { "a": "56" }, { "b": "7248" }, { "a": "48" }],
   "arrayWithSchema1": null,
   "null": null,
-  "undefined": "notUndefined"
+  "undefined": "notUndefined",
+  "message": "登陆成功"
 };
 const delta = verify(jsonData, testSchema, { other: 1 });
 console.info('verify: ', delta);
