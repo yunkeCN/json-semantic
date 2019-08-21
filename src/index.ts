@@ -419,7 +419,7 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
           (context as any).setResult([context.left, context.right]).exit();
         }
       } else {
-        if (REG_MAP[format] || format === '' || format === undefined || format === null) {
+        if (REG_MAP[format] || format === '' || format === undefined || format === null || isRegExp.test(format)) {
           const reg = REG_MAP[format] || handleRegExp(format);
           if (reg.test(context.left) && isString(context.left)) {
             (context as any).setResult(undefined).exit();
