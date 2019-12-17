@@ -447,7 +447,18 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
     } else if (type === 'array') {
       const leftArr = context.left as any[];
       const rightArr = Array.isArray(leftArr) && leftArr.map(() => context.right.__item) || [context.right];
-      (context as any).setResult(getDiffPatcher(refData).diff(leftArr, rightArr)).exit();
+      rightArr.forEach(item => {
+        if (item.__type === "string") {
+          item.__format = item.__format || baseStrExp;
+        }
+      });
+      if (Array.isArray(leftArr)) {
+        leftArr.forEach((item, i) => {
+          (context as any).setResult(getDiffPatcher(refData).diff(item, rightArr[i])).exit();
+        });
+      } else {
+        (context as any).setResult(getDiffPatcher(refData).diff(leftArr, rightArr)).exit();
+      }
     } else if (type === 'ref') {
       const left = context.left;
       const right = jsonpath.value({
