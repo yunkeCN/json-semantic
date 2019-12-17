@@ -329,12 +329,13 @@ function parseRef(options: {
     case 'string':
       return schema1;
     case 'array':
-      return parseRef({
+      schema1.__item = parseRef({
         schema: item,
         args,
         resolveRef,
         path: `${path}.[]`,
       });
+      return schema1;
     case 'ref':
       if (!jsonPath) {
         throw new Error(`__jsonPath must specified when __type is ref`);
