@@ -3,3 +3,4 @@ yarn-error.log
 build
 .idea
 build
+node_modules
