@@ -83,6 +83,14 @@ const testSchema: ObjectSchema = {
   message: {
     __type: "string",
     __format: "xx"
+  },
+  "set-cookie": {
+    "__type": "array",
+    "__min": 1,
+    "__max": 10,
+    "__item": {
+      "__type": "string"
+    }
   }
 };
 
@@ -118,7 +126,12 @@ const jsonData = {
   "arrayWithSchema1": null,
   "null": null,
   "undefined": "notUndefined",
-  "message": "登陆成功"
+  "message": "登陆成功",
+  "set-cookie": [
+    "aaa",
+    "ddd",
+    {}
+  ]
 };
 const delta = verify(jsonData, testSchema, { other: 1 });
 console.info('verify: ', delta);
