@@ -47,11 +47,13 @@ export type ValueType = ValueTypeExcludeArray | ValueTypeExcludeArray[];
 export interface ObjectSchema {
   [key: string]: ValueType;
 
-  __type?: never;
-  __min?: never;
-  __max?: never;
-  __item?: never;
-  __format?: never;
-  __ratio?: never;
-  __jsonPath?: never;
+  __type?: string;
+  __min?: number;
+  __max?: number;
+  __item?: ArraySchema;
+  __format?: string;
+  __formatInteger?: string;
+  __ratio?: number;
+  __value?: string;
+  __jsonPath?: string;
 }
