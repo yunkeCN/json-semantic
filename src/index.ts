@@ -208,7 +208,7 @@ export function convertToMockJsTemplate(options: {
           case 'timestamps_second':
             return { template: Math.round(timestamps / 1000) };
           case 'timestamps_millisecond':
-            return { template: bigintValue };
+            return { template: timestamps };
           default:
             return { template: `@integer(${min}, ${max})` };
         }
