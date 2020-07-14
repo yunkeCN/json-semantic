@@ -1,6 +1,6 @@
 # JSON Semantic
 
-A specification and implementation for verifying and generating(mock) JSON data.
+A specification and implementation for verifying and generating(mock) JSON data .
 
 ## Example
 ```typescript
