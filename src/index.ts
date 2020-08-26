@@ -3,7 +3,7 @@ import { Delta, DiffContext } from "jsondiffpatch";
 import * as jsonpath from 'jsonpath';
 import * as mockjs from "mockjs";
 import HtmlFormatter from "./HtmlFormatter";
-import { ObjectSchema } from './types';
+import { ObjectSchema, ArraySchema } from './types';
 
 const MAX = 9007199254740992;
 const MIN = -9007199254740992;
@@ -127,7 +127,7 @@ function isArray(val: any): boolean {
 }
 
 export function convertToMockJsTemplate(options: {
-  schema: ObjectSchema | number | boolean | string | undefined | any[];
+  schema: ObjectSchema | ArraySchema | number | boolean | string | undefined | any[];
   args?: any;
   path?: string;
   resolveRef?: (node: { args: any; jsonPath: string; schema: any; }) => any;
@@ -191,15 +191,34 @@ export function convertToMockJsTemplate(options: {
 
   const {
     __format: format,
+    __formatInteger: formatInteger,
     __max: max = MAX,
     __min: min = MIN,
     __ratio: ratio,
     __item: item,
+    __value: bigintValue,
     __jsonPath: jsonPath,
   } = schema1;
 
   switch (type) {
     case 'integer':
+      if (formatInteger) {
+        const timestamps = Date.now();
+        switch (formatInteger) {
+          case 'timestamps_second':
+            return { template: Math.round(timestamps / 1000) };
+          case 'timestamps_millisecond':
+            return { template: timestamps };
+          default:
+            return { template: `@integer(${min}, ${max})` };
+        }
+      }
+      return { template: `@integer(${min}, ${max})` };
+    case 'bigint':
+      if (bigintValue) {
+        return { template: bigintValue };
+      }
+      // 否则mock普通integer
       return { template: `@integer(${min}, ${max})` };
     case 'float':
       return { template: `@float(${min}, ${max}, 1, 17)` };
@@ -260,7 +279,7 @@ export function convertToMockJsTemplate(options: {
  *
  */
 function parseRef(options: {
-  schema: ObjectSchema | number | boolean | string | undefined | any[];
+  schema: ObjectSchema | ArraySchema | number | boolean | string | undefined | any[];
   args: any;
   resolveRef?: (node: { args: any; jsonPath: string; schema: any; }) => any;
   path?: string;
@@ -315,18 +334,37 @@ function parseRef(options: {
 
   const {
     __format: format,
+    __formatInteger: formatInteger,
     __max: max,
     __min: min,
     __ratio: ratio,
     __item: item,
+    __value: bigintValue,
     __jsonPath: jsonPath,
   } = schema1;
 
   switch (type) {
-    case 'integer':
     case 'float':
     case 'boolean':
     case 'string':
+      return schema1;
+    case 'integer':
+      if (formatInteger) {
+        const timestamps = Date.now();
+        switch (formatInteger) {
+          case 'timestamps_second':
+            return Math.round(timestamps / 1000);
+          case 'timestamps_millisecond':
+            return timestamps;
+          default:
+            return schema1;
+        }
+      }
+      return schema1;
+    case 'bigint':
+      if (bigintValue) {
+        return bigintValue;
+      }
       return schema1;
     case 'array':
       schema1.__item = parseRef({
@@ -445,6 +483,11 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
       } else {
         (context as any).setResult([context.left, context.right]).exit();
       }
+    } else if (type === 'bigint') {
+      const left = context.left;
+      const { __value: right } = context.right;
+
+      (context as any).setResult([left, right]).exit();
     } else if (type === 'array') {
       const leftArr = context.left as any[];
       const rightArr = Array.isArray(leftArr) && leftArr.map(() => context.right.__item) || [context.right];
