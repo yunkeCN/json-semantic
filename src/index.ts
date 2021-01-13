@@ -391,6 +391,8 @@ function parseRef(options: {
         resolveRef,
         path,
       });
+    case 'ref_env':
+      return schema1;
     default:
       throw new Error(`Unsupported type: ${type}`);
   }

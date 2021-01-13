@@ -80,6 +80,11 @@ const testSchema: ObjectSchema = {
     __type: 'ref',
     __jsonPath: '$.other1.add',
   },
+  refEnv: {
+    __type: 'ref_env',
+    __envid: 111,
+    __templateStr: "{{parse}}"
+  },
   message: {
     __type: "string",
     __format: "xx"
