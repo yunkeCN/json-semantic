@@ -270,6 +270,8 @@ export function convertToMockJsTemplate(options: {
       return {
         template: templateRef,
       };
+    case 'ref_env':
+      return { template: schema1 };
     default:
       throw new Error(`Unsupported type: ${type}`);
   }
