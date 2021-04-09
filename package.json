@@ -1,6 +1,6 @@
 {
   "name": "json-semantic",
-  "version": "1.5.4",
+  "version": "1.6.0",
   "description": "A specification and implementation for verifying and generating(mock) JSON data.",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "jsondiffpatch": "^0.3.11",
-    "jsonpath": "^1.0.0",
+    "jsonpath": "^1.1.1",
     "lodash.clonedeep": "^4.5.0",
     "lodash.topath": "^4.5.2",
     "mockjs": "^1.1.0"
