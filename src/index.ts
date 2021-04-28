@@ -532,9 +532,12 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
   } else {
     if (/^@regexp:/i.test(context.right)) {
       const right = context.right.substr(8);
-      if (/^\/[^/]+\/([a-z]{0,})/.test(right)) {
+      if (isRegExp.test(right)) {
         if (eval(right).test(context.left)) {
           const result = (context as any).setResult(undefined);
+          result.exit();
+        } else {
+          const result = (context as any).setResult([context.left, context.right])
           result.exit();
         }
       } else {
@@ -542,25 +545,13 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
         if ( regex.test(context.left)) {
           const result = (context as any).setResult(undefined);
           result.exit();
-        }
-      }
-      if (REG_MAP[right] || right === '' || right === undefined || right === null || isRegExp.test(right)) {
-        const reg = REG_MAP[right] || handleRegExp(right);
-        if (reg.test(context.left) && isString(context.left)) {
-          const result = (context as any).setResult(undefined);
-
-          result.exit();
         } else {
-          const result = (context as any).setResult([context.left, context.right]);
+          const result = (context as any).setResult([context.left, context.right])
           result.exit();
         }
-      } else {
-        const result = (context as any).setResult([context.left, context.right]);
-        result.exit();
       }
     }
   }
-
 };
 
 export function getDiffPatcher(refData: any = {}) {

@@ -138,14 +138,14 @@ const jsonData = {
     "ddd",
     {}
   ],
-  "message2": '1234'
+  "message2": '1234f'
 };
 
 const delta = verify(jsonData, testSchema, { other: 1 });
 console.info('verify: ', delta);
 
 if (delta) {
-  console.info('visual: ', htmlFormat(delta, jsonData));
+  // console.info('visual: ', htmlFormat(delta, jsonData));
 }
 
 const test = {
