@@ -138,7 +138,7 @@ const jsonData = {
     "ddd",
     {}
   ],
-  "message2": '1234f'
+  "message2": '1234'
 };
 
 const delta = verify(jsonData, testSchema, { other: 1 });

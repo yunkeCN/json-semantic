@@ -532,23 +532,21 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
   } else {
     if (/^@regexp:/i.test(context.right)) {
       const right = context.right.substr(8);
+      let regex: RegExp;
       if (isRegExp.test(right)) {
-        if (eval(right).test(context.left)) {
-          const result = (context as any).setResult(undefined);
-          result.exit();
-        } else {
-          const result = (context as any).setResult([context.left, context.right])
-          result.exit();
-        }
+        let reg = isRegExp.exec(right) as any;
+        const pattern = isArray(reg) && reg[2];
+        const modifiers = isArray(reg) && reg[5];
+        regex = new RegExp(pattern, modifiers);
       } else {
-        const regex = new RegExp(right);
-        if ( regex.test(context.left)) {
-          const result = (context as any).setResult(undefined);
-          result.exit();
-        } else {
-          const result = (context as any).setResult([context.left, context.right])
-          result.exit();
-        }
+        regex = new RegExp(right);
+      }
+      if (regex.test(context.left)) {
+        const result = (context as any).setResult(undefined);
+        result.exit();
+      } else {
+        const result = (context as any).setResult([context.left, context.right])
+        result.exit();
       }
     }
   }
