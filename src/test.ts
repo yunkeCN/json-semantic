@@ -97,7 +97,7 @@ const testSchema: ObjectSchema = {
       "__type": "string"
     }
   },
-  "message2": "@regexp:^\\d+$"
+  "message2": "@regexp:/^\\w+$/g"
 };
 
 const schemaStr = stringify(testSchema);
@@ -138,7 +138,7 @@ const jsonData = {
     "ddd",
     {}
   ],
-  "message2": '1234'
+  "message2": 'fbgG'
 };
 
 const delta = verify(jsonData, testSchema, { other: 1 });

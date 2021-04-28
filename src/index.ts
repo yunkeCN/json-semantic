@@ -536,7 +536,7 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
       if (isRegExp.test(right)) {
         let reg = isRegExp.exec(right) as any;
         const pattern = isArray(reg) && reg[2];
-        const modifiers = isArray(reg) && reg[5];
+        const modifiers = isArray(reg) && reg[4];
         regex = new RegExp(pattern, modifiers);
       } else {
         regex = new RegExp(right);
