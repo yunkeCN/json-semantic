@@ -457,41 +457,52 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
     if (type === 'string') {
       if (format instanceof RegExp) {
         if ((format as RegExp).test(context.left as string) && isString(context.left)) {
-          (context as any).setResult(undefined).exit();
+          const result = (context as any).setResult(undefined);
+          result.exit();
         } else {
-          (context as any).setResult([context.left, context.right]).exit();
+          const result = (context as any).setResult([context.left, context.right]);
+          result.exit();
         }
       } else {
         if (REG_MAP[format] || format === '' || format === undefined || format === null || isRegExp.test(format)) {
           const reg = REG_MAP[format] || handleRegExp(format);
           if (reg.test(context.left) && isString(context.left)) {
-            (context as any).setResult(undefined).exit();
+            const result = (context as any).setResult(undefined);
+
+            result.exit();
           } else {
-            (context as any).setResult([context.left, context.right]).exit();
+            const result = (context as any).setResult([context.left, context.right]);
+            result.exit();
           }
         } else {
-          (context as any).setResult([context.left, context.right]).exit();
+          const result = (context as any).setResult([context.left, context.right]);
+          result.exit();
         }
       }
     } else if (type === 'float') {
       const { __min: min = -Infinity, __max: max = Infinity } = context.right;
       if (/^-?\d+\.\d+$/.test(context.left as string) && context.left >= min && context.left <= max) {
-        (context as any).setResult(undefined).exit();
+        const result = (context as any).setResult(undefined)
+        result.exit();
       } else {
-        (context as any).setResult([context.left, context.right]).exit();
+        const result = (context as any).setResult([context.left, context.right])
+        result.exit();
       }
     } else if (type === 'integer') {
       const { __min: min = -Infinity, __max: max = Infinity } = context.right;
       if (/^-?\d+$/.test(context.left as string) && context.left >= min && context.left <= max) {
-        (context as any).setResult(undefined).exit();
+        const result = (context as any).setResult(undefined)
+        result.exit();
       } else {
-        (context as any).setResult([context.left, context.right]).exit();
+        const result = (context as any).setResult([context.left, context.right])
+        result.exit();
       }
     } else if (type === 'bigint') {
       const left = context.left;
       const { __value: right } = context.right;
 
-      (context as any).setResult([left, right]).exit();
+      const result = (context as any).setResult([left, right])
+      result.exit();
     } else if (type === 'array') {
       const leftArr = context.left as any[];
       const rightArr = Array.isArray(leftArr) && leftArr.map(() => context.right.__item) || [context.right];
@@ -502,10 +513,12 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
       });
       if (Array.isArray(leftArr)) {
         leftArr.forEach((item, i) => {
-          (context as any).setResult(getDiffPatcher(refData).diff(item, rightArr[i])).exit();
+          const result = (context as any).setResult(getDiffPatcher(refData).diff(item, rightArr[i]))
+          result.exit();
         });
       } else {
-        (context as any).setResult(getDiffPatcher(refData).diff(leftArr, rightArr)).exit();
+        const result = (context as any).setResult(getDiffPatcher(refData).diff(leftArr, rightArr))
+        result.exit();
       }
     } else if (type === 'ref') {
       const left = context.left;
@@ -513,7 +526,28 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
         self: (context as any).root.left,
         ...refData,
       }, context.right.__jsonPath);
-      (context as any).setResult(getDiffPatcher(refData).diff(left, right)).exit();
+      const result = (context as any).setResult(getDiffPatcher(refData).diff(left, right))
+      result.exit();
+    }
+  } else {
+    if (/^@regexp:/i.test(context.right)) {
+      const right = context.right.substr(8);
+      let regex: RegExp;
+      if (isRegExp.test(right)) {
+        let reg = isRegExp.exec(right) as any;
+        const pattern = isArray(reg) && reg[2];
+        const modifiers = isArray(reg) && reg[4];
+        regex = new RegExp(pattern, modifiers);
+      } else {
+        regex = new RegExp(right);
+      }
+      if (regex.test(context.left)) {
+        const result = (context as any).setResult(undefined);
+        result.exit();
+      } else {
+        const result = (context as any).setResult([context.left, context.right])
+        result.exit();
+      }
     }
   }
 };
