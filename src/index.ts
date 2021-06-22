@@ -454,7 +454,15 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
   const type = context.right.__type;
   if (type) {
     const { __format: format } = (context.right as any);
-    if (type === 'string') {
+    if (type === 'boolean') {
+      if (isBoolean(context.left)) {
+        const result = (context as any).setResult(undefined);
+        result.exit();
+      } else {
+        const result = (context as any).setResult([context.left, context.right])
+        result.exit();
+      }
+    } else if (type === 'string') {
       if (format instanceof RegExp) {
         if ((format as RegExp).test(context.left as string) && isString(context.left)) {
           const result = (context as any).setResult(undefined);
