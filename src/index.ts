@@ -489,7 +489,7 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
       }
     } else if (type === 'float') {
       const { __min: min = -Infinity, __max: max = Infinity } = context.right;
-      if (/^-?\d+\.\d+$/.test(context.left as string) && context.left >= min && context.left <= max) {
+      if (/^-?\d+(\.\d+)?$/.test(context.left as string) && context.left >= min && context.left <= max) {
         const result = (context as any).setResult(undefined)
         result.exit();
       } else {
