@@ -11,6 +11,12 @@ const testSchema: ObjectSchema = {
   float2: {
     __type: "float"
   },
+  float3: {
+    __type: "float"
+  },
+  float4: {
+    __type: "float"
+  },
   number: 0,
   string: 'string',
   boolean: true,
@@ -238,6 +244,8 @@ const generateSchemaStr = generate(testSchema, { other: 1 });
 const jsonData = {
   float1: -1,
   float2: -1.1,
+  float3: 1.1,
+  float4: 1.0,
   number: 1,
   string: 'string1',
   boolean: false,
