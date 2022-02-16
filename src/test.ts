@@ -6,21 +6,36 @@ import { ObjectSchema } from './types';
 
 const testSchema: ObjectSchema = {
   float1: {
-    __type: "float"
+    __type: 'float',
   },
   float2: {
-    __type: "float"
+    __type: 'float',
   },
   float3: {
-    __type: "float"
+    __type: 'float',
   },
   float4: {
-    __type: "float"
+    __type: 'float',
   },
   number: 0,
   string: 'string',
   boolean: true,
-  array: [1, 2],
+  arrayEmpty: {
+    __type: 'array',
+    __max: Infinity,
+    __min: 0,
+    __item: {
+      __type: 'integer',
+    },
+  },
+  array: {
+    __type: 'array',
+    __max: Infinity,
+    __min: 0,
+    __item: {
+      __type: 'integer',
+    },
+  },
   object: {
     a: 1,
     b: {
@@ -249,6 +264,7 @@ const jsonData = {
   number: 1,
   string: 'string1',
   boolean: false,
+  arrayEmpty: [],
   array: [2, 2],
   object: { a: 2, b: 'b' },
   numberWithSchema: 4,
@@ -561,6 +577,34 @@ const delta = verify(jsonData, testSchema, { other: 1 });
 console.info('verify: ', delta);
 
 if (delta) {
-  const foramtData = htmlFormat(delta, jsonData);
-  console.info('visual');
+  const formatData = htmlFormat(delta, jsonData);
+
+  if (formatData) {
+    const deltaKeysIsRight = verify(
+      {
+        keys: Object.keys(delta),
+      },
+      {
+        keys: [
+          'number',
+          'string',
+          'boolean',
+          'object',
+          'stringWithSchema2',
+          'arrayWithSchema1',
+          'undefined',
+          'message',
+          'set-cookie',
+          'refSchema',
+          'refSchemaOther',
+          'refEnv',
+        ],
+      },
+    );
+    if (!deltaKeysIsRight) {
+      console.log(`\x1B[32m%s\x1B[39m`, '✨  test succeed');
+    } else {
+      console.log(`\x1b[31m%s\x1B[39m`, '✨  test failed');
+    }
+  }
 }
