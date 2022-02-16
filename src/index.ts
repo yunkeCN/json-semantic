@@ -513,6 +513,10 @@ const makeDiffFilter = (refData: any) => function (context: DiffContext) {
       result.exit();
     } else if (type === 'array') {
       const leftArr = context.left as any[];
+      if (Array.isArray(leftArr) && leftArr.length === 0) {
+        const result = (context as any).setResult(undefined)
+        result.exit();
+      }
       const rightArr = Array.isArray(leftArr) && leftArr.map(() => context.right.__item) || [context.right];
       rightArr.forEach(item => {
         if (item.__type === "string") {
